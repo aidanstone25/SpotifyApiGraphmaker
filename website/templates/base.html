@@ -1,0 +1,36 @@
+<head>
+    <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+        crossorigin="anonymous"
+      />
+      <link
+        rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        crossorigin="anonymous"
+      />
+    <link rel="stylesheet" href="static\bsearch.css">
+  </head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbar"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbar">
+          <div class="navbar-nav">
+            <a class="nav-item nav-link" id="home" href="/">User Playlists</a>
+            <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+            <a class="nav-item nav-link" id="album" href="/album">Albums</a>
+            <a class="nav-item nav-link" id="artist" href="/artist">Artist</a>
+          </div>
+        </div>
+      </nav>
+</body>
+
+{%block content%} {%endblock%}
