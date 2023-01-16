@@ -320,8 +320,8 @@ class SpotipyConnection(object):
         self.graph_pop_songs(self.get_song_pop(self.get_popularity(self.get_songs_id(self.get_album_song_pop(query)))))
     def rehehe(self,query):
         return self.get_popularity(self.get_songs_id(self.get_album_song_pop(query)))
-client_id = '4e3d2cc9dfe2450890181834312c968d'
-client_secret = '4bdae51c78e84281ba04e1658a0d41f5'
+client_id = ''
+client_secret = ''
 #thing = SpotipyConnection(client_id=client_id,client_secret=client_secret)
 #thing23 = thing.rehehe('Monster')
 #thing.graph_pop_songs_full('My Beautiful Dark Twisted Fantasy')
