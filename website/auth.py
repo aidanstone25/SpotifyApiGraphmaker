@@ -184,7 +184,7 @@ def get_token():
 #creates auth token
 def create_spotify_oauth():
     return SpotifyOAuth(
-            client_id='4e3d2cc9dfe2450890181834312c968d',
-            client_secret='973e2a8c81b24a49891e69de31f143b4',
+            client_id='',
+            client_secret='',
             redirect_uri="http://127.0.0.1:5000/authorize",
             scope="playlist-read-private")
