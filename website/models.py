@@ -2,7 +2,7 @@ from . import db
 from flask_login import UserMixin
 from sqlalchemy.sql import func
 import sequence
-#sequence.Sequence
+
 #TODO all id's have a fixed length, don't just put random lengths
 
 class Artist(db.Model):
@@ -11,7 +11,6 @@ class Artist(db.Model):
     date = db.Column(db.DateTime(timezone=True), default=func.now())
     user_id = db.Column(db.Integer, db.ForeignKey('user.spotify_user_id'))
 
-#TODO okay so I'm an idiot, how am I gonna link albums and user?
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     spotify_user_id = db.Column(db.String(10000),unique=True)

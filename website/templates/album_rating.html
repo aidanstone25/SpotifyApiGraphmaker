@@ -2,21 +2,7 @@
 {% block title %}Album ratings{% endblock %}
 {%block content%}
 <h1>Add Albums</h1>
-<ul class="list-group list-group-flush" id="Albums">
-    {%for album in user.Albums%}
-    <li class="list-group-item">
-      <div id="main_activity">
-        {{album.album}}
-      </div>
-        {album.rating}
-        <button type="button" class="close" style="float: right" onClick="deleteAlbum({{ album.album_id }})">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        <li class="dropdown-menu"></li>
-    </li>
-    {%endfor%}
 
-</ul>
 <form method="POST">
     <textarea name="new_album" id="new_album" class="form-control" placeholder="Enter album"></textarea>
     <input pattern="[1-9]|10" type="number" name="Rating" id="Rating" placeholder="Rating">
@@ -26,4 +12,26 @@
     </div>
   </form>
 
+
+  <ul class="list-group list-group-flush" id="albums">
+    {%for album in user.Albums%}
+    <li class="list-group-item">
+      <div id="main_activity">
+        {{album.album}}
+      </div>
+      <div id="rating">
+        {{album.album_rating}}
+      </div>
+      {{album.artist}}
+      <img src={{album.album_cover_link}} id="album_cover">
+
+        <button id="delete-button" type="button" class="close" style="float: right" onClick="delete_album({{ album.album_id }})">
+
+            <span aria-hidden="true">&times;</span>
+          </button>
+        <li class="dropdown-menu"></li>
+    </li>
+    {%endfor%}
+
+</ul>
   {%endblock%}

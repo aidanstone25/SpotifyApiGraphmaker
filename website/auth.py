@@ -4,22 +4,17 @@ from flask import Flask, url_for, session, request, redirect, flash,render_templ
 import json
 import time
 import pandas as pd
-import requests
-from . import popularity_graph
 from .popularity_graph import get_song_pop,graph_pop_songs
 from flask_login import login_user, logout_user,current_user
 from . import db
 from . models import Albums,User,Artist
 from . import artist_grapher
-
+import jsonify
 
 
 auth = Blueprint('auth', __name__)
 
-
-
-
-#reauthorize
+#spotify auth, creates local account for database
 @auth.route('/')
 def login():
     sp_oauth = create_spotify_oauth()
@@ -30,7 +25,6 @@ def login():
     if user:
         login_user(user=user,remember=True)
     else:
-        #TODO on my life whenever I make both primary keys it wont auto increment ID, 1 IS A PLACEHOLDER, gotta figure this out later but since its just me its alright ig 
         new_user = User(spotify_user_id=signed_in_user['id'])
         db.session.add(new_user)
         db.session.commit()
@@ -39,7 +33,7 @@ def login():
     return redirect(auth_url)
 
 
-#spotify auth+adds/signs in user to local database
+#reauthorize
 @auth.route('/authorize')
 def authorize():
     sp_oauth = create_spotify_oauth()
@@ -50,7 +44,7 @@ def authorize():
     return redirect("/home")
 
 
-#TODO doesn't work, need to delete session cookie but clear doesn't work
+#TODO doesn't work, need to delete session cookie but session.clear() doesn't work
 @auth.route('/logout')
 def logout():
     s = """
@@ -69,15 +63,14 @@ def logout():
      
     return render_template('/loginbutton.html')
     """
-    for key in list(session.keys()):
-        session.pop(key)
+    
     logout_user()
     session.clear()
     
     return redirect('/loginbutton')
     
 
-
+#Redirected when logout
 @auth.route('/loginbutton',methods=['GET','POST'])
 def loginbutton():
     if request.method == 'POST':
@@ -97,29 +90,20 @@ def get_all_tracks():
         #storef userplaysists in cache if you get tiome
         user_playlists = sp.current_user_playlists()
         
+        #TODO store in cache?
         user_playlists_dict = {}
         for playlist in user_playlists['items']:         
-            user_playlists_dict[playlist['name']] = playlist['id'] 
-        
-        #return sp.user_playlist_tracks(playlist_id='4keX53IMfZdgD6xhDfWDtk')
-        try:
-            playlist_id = searched_playlist[searched_playlist]
-            playlist = sp.user_playlist_tracks(playlist_id=playlist_id)
-            song_dict={}
-            for song in playlist['items']:
-                song_dict[song['name']] = song['popularity']
-            return [song_dict,searched_playlist,'uauauhs']
-        except:
-            pass
-        if searched_playlist in user_playlists_dict.keys():
+            user_playlists_dict[playlist['name']] = playlist['id']         
+
+
+        if searched_playlist in user_playlists_dict.keys(): 
             song_dict= get_song_pop(sp.user_playlist_tracks(playlist_id=user_playlists_dict[searched_playlist]))
             graph_pop_songs(song_dict)
         else:
             flash('Playlist not found',category='error')
-        
     return render_template('search.html',user=current_user)
-
-
+#TODO function to change scores
+#Rate albums
 @auth.route('/album_rating',methods=['GET','POST'])
 def album_rating():
     session['token_info'], authorized = get_token()
@@ -138,7 +122,6 @@ def album_rating():
             album_id = ag.get_album_id(name=album_name)
             signed_in_user=sp.current_user()
             Album = Albums.query.filter_by(spotify_user_id=signed_in_user['id'],album_id=album_id).first()
-            #TODO never catches duplicate album, throws integrity error
             if Album:
                 flash('This album is a duplicate',category='error')
             else:
@@ -146,7 +129,7 @@ def album_rating():
                 current_user_id = signed_in_user=signed_in_user['id']
                 new_album = Albums(album_id = album_id, album=album_name, artist= album_stuff[1],artist_id=album_stuff[0],album_rating=album_rating,album_cover_link=album_stuff[-1],popularity=album_stuff[2],spotify_user_id=current_user_id)
                 db.session.add(new_album)
-                #urelated, but funny pickup line: If you're looking for a stud, I got an std, all I need is u
+                #urelated, but funny pickup line joe told me: If you're looking for a stud, I got an std, all I need is u
                 db.session.commit()
                 flash('album added!',category='success')
 
@@ -161,6 +144,8 @@ def delete_album():
         if album.user_id == current_user.id:
             db.session.delete(album)
             db.session.commit()
+            flash('Album deleted',category='success')
+    return None
 
 #Gets the popularity of each album in artists discography
 @auth.route('/artist',methods=['GET','POST'])
@@ -177,21 +162,18 @@ def artist():
         ag.graph_pop_songs_full(query=searched_artist)
     return render_template('album.html')
     
-# Checks to see if token is valid and gets a new token if not
+#Checks to see if token is valid and gets a new token if not
 def get_token():
     token_valid = False
     token_info = session.get("token_info", {})
 
-    # Checking if the session already has a token stored
     if not (session.get('token_info', False)):
         token_valid = False
         return token_info, token_valid
 
-    # Checking if token has expired
     now = int(time.time())
     is_token_expired = session.get('token_info').get('expires_at') - now < 60
 
-    # Refreshing token if it has expired
     if (is_token_expired):
         sp_oauth = create_spotify_oauth()
         token_info = sp_oauth.refresh_access_token(session.get('token_info').get('refresh_token'))
@@ -199,12 +181,10 @@ def get_token():
     token_valid = True
     return token_info, token_valid
 
-
+#creates auth token
 def create_spotify_oauth():
     return SpotifyOAuth(
-            client_id='',
-            client_secret='',
+            client_id='4e3d2cc9dfe2450890181834312c968d',
+            client_secret='973e2a8c81b24a49891e69de31f143b4',
             redirect_uri="http://127.0.0.1:5000/authorize",
             scope="playlist-read-private")
-
-#app.run(debug=True)

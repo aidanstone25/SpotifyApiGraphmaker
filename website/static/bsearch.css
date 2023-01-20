@@ -14,7 +14,16 @@ html, body {
 body {
   background: #252525;
 }
-
+#album_cover{
+  width: 100px;
+  height: 100px;
+}
+#main_activity{
+  font-size: 35px;
+}
+#rating{
+  font-size: 35px;
+}
 .container {
   position: absolute;
   margin: auto;

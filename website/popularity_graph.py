@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
     
 
 def get_song_pop(playlist):
+    #should be list instead of dict?
     stats = {}
     for song in playlist['items']:
         song  = song['track']
